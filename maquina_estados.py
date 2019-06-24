@@ -3,6 +3,12 @@ class Estado:
     Classe padrão de estados.
     """
     def __init__(self, nome, numero, proximo=None):
+        """
+        Inicialização da classe estado.
+        :param nome: String contendo o nome deste estado.
+        :param numero: Integer contendo o número deste estado.
+        :param proximo: String nomeando o próximo estado.
+        """
         self.nome = nome
         self.numero = numero
         self.proximo = proximo
@@ -32,6 +38,25 @@ class Maquina:
         self.estados = self.inicializa(estados)
         self.atual = self.estados[inicial]
 
+    def get_estado(self):
+        return self.atual
+
+    def set_estado(self, estado):
+        self.atual = self.estados[estado]
+
+    def get_proximo(self):
+        proximo = self.atual.proximo
+        if proximo:
+            if proximo in self.estados:  # Se não existe o estado retorna nada. TODO: Subir erro?
+                return self.estados[self.atual.proximo]
+            else:
+                print('Próximo estado: {}, não existe!!!'.format(proximo))
+                return None
+        return None
+
+    def to_proximo(self):
+        self.atual = self.get_proximo()
+
     @staticmethod
     def inicializa(estados):
         """
@@ -53,23 +78,17 @@ class Maquina:
         Executa o estado atual e vai para o próximo.
         :return: None.
         """
-        self.atual = self.atual.executa(kwargs)
+        self.atual.executa(**kwargs)
 
-    def percorre_todos(self):
+    def ciclo(self, **kwargs):
         """
-        Executa os estados na sequência em que foram passados.
-        :return: None.
+        Percorre cada um dos estados, executa eles, até que o próximo seja None.
+        :param kwargs:
+        :return:
         """
-        for estado in self.estados:
-            self.atual = estado
-            self.executa()
+        while self.atual is not None:
+            self.executa(**kwargs)
+            self.to_proximo()
 
-    def get_estado(self):
-        return self.estados[self.atual]
 
-    def get_proximo(self):
-        proximo = self.atual.proximo
-        if proximo:
-            return self.estados[self.atual.proximo]
-        return None
 
